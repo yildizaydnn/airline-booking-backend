@@ -1,6 +1,6 @@
 const info = (req, res) => {
   return res.json({
-    succes: true,
+    success: true,
     message: "API is live",
     error: {},
     data: {},
