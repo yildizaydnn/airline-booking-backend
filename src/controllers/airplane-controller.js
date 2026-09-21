@@ -9,11 +9,11 @@ async function createAirplane(req, res) {
       modelNumber: req.body.modelNumber,
       capacity: req.body.capacity,
     });
-    SuccessResponse.data = airplane;
-    return res.status(StatusCodes.CREATED).json(SuccessResponse);
+    return res.status(StatusCodes.CREATED).json(SuccessResponse(airplane));
   } catch (error) {
-    ErrorResponse.error = error;
-    return res.status(error.StatusCodes).json(ErrorResponse);
+    return res
+      .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(ErrorResponse(error, error.explanation || error.message));
   }
 }
 
