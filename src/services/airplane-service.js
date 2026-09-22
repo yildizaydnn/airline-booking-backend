@@ -1,5 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 
+const { Logger } = require("../config");
 const { AirplaneRepository } = require("../repositories");
 const AppError = require("../utils/errors/app-error");
 
@@ -10,14 +11,19 @@ async function createAirplane(data) {
     const airplane = await airplaneRepository.create(data);
     return airplane;
   } catch (error) {
-    console.log(error);
-    if (error.name == "TypeError") {
-      throw new AppError(
-        "Cannot create a new Airplane object with the provided data",
-        StatusCodes.INTERNAL_SERVER_ERROR,
-      );
+    Logger.error(`createAirplane failed: ${error.name} - ${error.message}`);
+
+    // Model dogrulamasi (allowNull, validate) basarisiz -> istemcinin hatasi
+    if (error.name === "SequelizeValidationError") {
+      const explanation = error.errors.map((err) => err.message);
+      throw new AppError(explanation, StatusCodes.BAD_REQUEST);
     }
-    throw error;
+
+    // Tanimadigimiz her sey -> sunucu hatasi
+    throw new AppError(
+      "Cannot create a new Airplane object",
+      StatusCodes.INTERNAL_SERVER_ERROR,
+    );
   }
 }
 
