@@ -1,4 +1,7 @@
+const { StatusCodes } = require("http-status-codes");
+
 const { Logger } = require("../config");
+const AppError = require("../utils/errors/app-error");
 
 class CrudRepository {
   constructor(model) {
@@ -11,64 +14,42 @@ class CrudRepository {
   }
 
   async destroy(data) {
-    try {
-      const response = await this.model.destroy({
-        where: {
-          id: data,
-        },
-      });
-      return response;
-    } catch (error) {
-      Logger.error(
-        "Something went wrong in the Crud Repository Layer",
-        "destroy",
-      );
-      throw error;
-    }
+    const response = await this.model.destroy({
+      where: {
+        id: data,
+      },
+    });
+    return response;
   }
 
   async get(data) {
-    try {
-      const response = await this.model.findByPk(data);
-
-      return response;
-    } catch (error) {
-      Logger.error("Something went wrong in the Crud Repository Layer", "get");
-      throw error;
+    const response = await this.model.findByPk(data);
+    if (!response) {
+      Logger.error("No record found in the database");
+      throw new AppError(
+        "No record found in the database",
+        StatusCodes.NOT_FOUND,
+      );
     }
+    return response;
   }
 
   async getAll(data) {
-    try {
-      const response = await this.model.findAll();
+    const response = await this.model.findAll();
 
-      return response;
-    } catch (error) {
-      Logger.error(
-        "Something went wrong in the Crud Repository Layer",
-        "getAll",
-      );
-      throw error;
-    }
+    return response;
   }
 
   async update(id, data) {
     // data is an object
-    try {
-      const response = await this.model.update(data, {
-        where: {
-          id: id,
-        },
-      });
 
-      return response;
-    } catch (error) {
-      Logger.error(
-        "Something went wrong in the Crud Repository Layer",
-        "update",
-      );
-      throw error;
-    }
+    const response = await this.model.update(data, {
+      where: {
+        id: id,
+      },
+    });
+
+    return response;
   }
 }
 
