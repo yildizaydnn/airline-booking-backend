@@ -19,6 +19,12 @@ class CrudRepository {
         id: data,
       },
     });
+    if (!response) {
+      throw new AppError(
+        "No record found in the database",
+        StatusCodes.NOT_FOUND,
+      );
+    }
     return response;
   }
 
